@@ -1,0 +1,43 @@
+import sys, json, requests
+from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6.QtCore import Qt
+
+class TableModel(QtCore.QAbstractTableModel):
+    def __init__(self, data):
+        super().__init__()
+        self.catalogs = json.loads(data)
+        #self.setHeaderData(0 , "name")
+
+    def data(self, index, role):
+        if role == Qt.DisplayRole:
+            # index.row() индексирует по внешнему списку, index.column() — по подсписку
+            if index.column() == 0: 
+                return self.catalogs[index.row()]["name"]
+            else: 
+                return self.catalogs[index.row()]["title"]
+
+    def rowCount(self, index):
+        return len(self.catalogs)
+
+    def columnCount(self, index):
+        return 2 #len(self._data)
+
+class MainWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.table = QtWidgets.QTableView()
+
+        url = "https://python1c.ru/catalogs/api?format=json"
+        catalog = requests.get(url)
+        #str_catalog = '[{"id":49,"name":"Богу молись, а к берегу гребись. ","title":"(Пословица означает, что недостаточно того, что ты просишь Высшие Силы тебе помочь в твоем деле, нужно еще и самому прилагать усилия, для успеха в нем.)"},{"id":48,"name":"Богу — Богово, а кесарю — кесарево. ","title":"(Фраза изречена Иисусом Христом. Вкратце означает что каждому свое, каждому по заслугам. Каждый получает то что ему положено.)"},{"id":79,"name":"Ваши-то речи да Богу в уши. ","title":"(Русская пословица. Говорится в ответ на хорошее пожелание или приятные слова, чтобы это хорошее сбылось.)"},{"id":185,"name":"Заставь дурака Богу молиться, они и лоб себе расши","title":"(Пословица говорится о тех людях, которые слишком рьяно подходят к делу, делают и говорят больше, чем это необходимо для удачного завершения дела.)"}]'
+        self.table.setModel(TableModel(catalog.text))
+        self.setCentralWidget(self.table)
+
+        self.table.setAlternatingRowColors(True)
+        self.table.resizeColumnToContents(0)
+        #self.table.resizeColumnToContents(1)
+
+app = QtWidgets.QApplication(sys.argv)
+window = MainWindow()
+window.show()
+app.exec()    
