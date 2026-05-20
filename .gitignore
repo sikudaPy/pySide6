@@ -7,6 +7,5 @@ venv/*
 *.pyd
 
 # Игнорировать папки кэша
+__pycache__
 __pycache__/
-books/__pycache__/
-books/*.pyc
